@@ -1,16 +1,25 @@
+from django.contrib.auth.models import User
+from django.contrib.postgres.fields import JSONField
 from django.db import models
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import AbstractUser
-# Create your models here.
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, related_name='user_profile', on_delete=models.CASCADE)
+    enrichment_data = models.CharField(max_length = 255)
 
 
 class Post(models.Model):
-    title = models.TextField(unique=True)
-    added = models.DateTimeField(auto_now_add=True)
-    content = models.TextField()
-    likes = models.IntegerField(default=0)
-    dislikes = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    title = models.CharField(max_length=255)
+    text = models.TextField()
 
-        return "{} - {} - {} - {} - {}".format(self.title, self.added, self.content, self.likes, self.dislikes)
+    author = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
+
+
+class Like(models.Model):
+    user = models.ForeignKey(User, related_name='likes', on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, related_name='likes', on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = (('user', 'post',),)

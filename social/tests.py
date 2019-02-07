@@ -31,10 +31,32 @@ class GetAllPostsTest(BaseViewTest):
         """
         # hit the API endpoint
         response = self.client.get(
-            reverse("posts-all", kwargs={"version": "v1"})
+            reverse("posts-all")
         )
         # fetch the data from db
         expected = Post.objects.all()
         serialized = PostsSerializer(expected, many=True)
         self.assertEqual(response.data, serialized.data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+
+
+def login_client(self, username="", password=""):
+    # get a token from DRF
+    response = self.client.post(
+        reverse('create-token'),
+        data=json.dumps(
+            {
+                'username': username,
+                'password': password
+            }
+        ),
+        content_type='application/json'
+    )
+    self.token = response.data['token']
+    # set the token in the header
+    self.client.credentials(
+        HTTP_AUTHORIZATION='Bearer ' + self.token
+    )
+    self.client.login(username=username, password=password)
+    return self.token
