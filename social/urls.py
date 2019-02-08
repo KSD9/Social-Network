@@ -7,7 +7,6 @@ router = DefaultRouter()
 router.register(r'post', PostViewSet, basename='post')
 
 urlpatterns = [
-    path('posts/', ListPostsView.as_view(), name="posts-all"),
     path('auth/login/', LoginView.as_view(), name="auth-login"),
     path('auth/register/', RegisterUsers.as_view(), name="auth-register"),
 ]

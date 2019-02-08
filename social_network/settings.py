@@ -75,8 +75,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'social_network.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
     'default': {
@@ -108,17 +106,10 @@ AUTH_PASSWORD_VALIDATORS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
-        # 'rest_framework.authentication.SessionAuthentication',
-        # 'rest_framework.authentication.BasicAuthentication',
-        # 'rest_framework.authentication.TokenAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-        # 'dry_rest_permissions.generics.DRYPermissions',
     ),
-    # 'DEFAULT_PAGINATION_CLASS': None,
-    # 'PAGE_SIZE': 10,
 }
 
 # JWT conf
@@ -152,7 +143,6 @@ CLEARBIT_PUBLIC = os.getenv('CLEARBIT_PUBLIC', 'pk_6d4f1fc73e112388f8e1c6fb20bb1
 # Email Hunter
 HUNTER_API_KEY = os.getenv('HUNTER_API_KEY', '238af370304363132c7345371b5e052e3a856979')
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.11/howto/static-files/
-
+#
 STATIC_URL = '/static/'
+

@@ -10,10 +10,8 @@ class UserProfile(models.Model):
 
 class Post(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-
     title = models.CharField(max_length=255)
     text = models.TextField()
-
     author = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
 
 

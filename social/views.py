@@ -1,5 +1,7 @@
+import base64
 import clearbit
 from.utils import ehunter
+from django.conf import settings
 from .models import Post,Like,UserProfile
 from .serializers import PostsSerializer, UserRegisterSerializer,UserLoginSerializer, TokenSerializer, LikeSerializer
 from django.contrib.auth import authenticate, login
@@ -14,23 +16,11 @@ jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
 jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
 
 
-class ListPostsView(generics.ListAPIView):
-    permission_classes = (permissions.AllowAny,)
-    """
-    Provides a get method handler.
-    """
-    posts = Post.objects.all()
-    likes = Like.objects.all()
-    queryset = Post.objects.all()
-    serializer_class = PostsSerializer
-
-
 class PostViewSet(viewsets.ModelViewSet):
 
     queryset = Post.objects.all()
     serializer_class = PostsSerializer
-    # permission_classes = (permissions.IsAuthenticated,)
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def create(self, request, *args, **kwargs):
         post = Post.objects.create(
@@ -49,7 +39,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
         like, created = Like.objects.get_or_create(post=post, user=request.user)
 
-        # We should notify about an already existing like
+        # Notify about an already existing like
         if not created:
             return Response({'error': 'Like already placed.'}, status=status.HTTP_409_CONFLICT)
 
@@ -82,19 +72,28 @@ class RegisterUsers(generics.CreateAPIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST
             )
-        ehunter_response = ehunter.email_verifier(request.data.get("email"))
 
-        if ehunter_response['result'] == 'undeliverable':
-            return Response('Email provider does not exist!', status=status.HTTP_400_BAD_REQUEST)
+        """
+        Check if email provider is real. 
+        Unfortunately since I've reached my limit of Api calls I had to comment this line of code.
+        """
 
-        clearbit_response = clearbit.Enrichment.find(email=request.data["email"], stream=True)
+        # ehunter_response = ehunter.email_verifier(request.data.get("email"))
+        # if ehunter_response['result'] == 'undeliverable':
+            # return Response('Email provider does not exist!', status=status.HTTP_400_BAD_REQUEST)
+
+        """
+        Same goes here for clearbit.  
+        
+        """
+        # clearbit_response = clearbit.Enrichment.find(email=request.data["email"], stream=True)
 
         new_user = User.objects.create_user(
             username=username, password=password, email=email
         )
 
-        enrichment_data = clearbit_response["company"]["category"]["industry"]
-        UserProfile.objects.create(user=new_user, enrichment_data=enrichment_data)
+        # enrichment_data = clearbit_response["company"]["category"]["industry"]
+        # UserProfile.objects.create(user=new_user, enrichment_data=enrichment_data)
 
         return Response(
             data=UserRegisterSerializer(new_user).data,
@@ -117,14 +116,13 @@ class LoginView(generics.CreateAPIView):
         password = request.data.get("password", "")
         user = authenticate(request, username=username, password=password)
         if user is not None:
-
             payload = jwt_payload_handler(user)
             jwt_token = jwt_encode_handler(payload)
             serializer = TokenSerializer(data={
                 # using drf jwt utility functions to generate a token
                 "token": jwt_token
-                })
+            })
             login(request, user)
             serializer.is_valid()
+            return Response({"token": jwt_token})
         return Response(status=status.HTTP_401_UNAUTHORIZED)
-
