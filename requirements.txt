@@ -7,7 +7,7 @@ chardet==3.0.4
 checkbox-support==0.22
 clearbit==0.1.7
 command-not-found==0.3
-cryptography==1.2.3
+cryptography==3.2
 defer==1.0.6
 Django==2.1.5
 django-filter==2.1.0
